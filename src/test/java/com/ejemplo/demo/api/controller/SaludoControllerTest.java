@@ -12,10 +12,12 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.Instant;
 
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(SaludoController.class)
 class SaludoControllerTest {
@@ -35,28 +37,43 @@ class SaludoControllerTest {
     }
 
     @Test
-    @DisplayName("Debe retornar saludo con nombre")
-    void deberiaRetornarSaludo() throws Exception {
-
-        // 🔥 AQUÍ ESTÁ LA CLAVE (mock del servicio)
-        when(saludoService.crearSaludo("Ana"))
-                .thenReturn(new SaludoResponse("Hola, Ana", Instant.now()));
+    @DisplayName("Debe responder saludo por GET")
+    void debeResponderSaludoPorGet() throws Exception {
+        when(saludoService.crearSaludo(anyString()))
+                .thenReturn(new SaludoResponse(
+                        "Hola, Ana. Bienvenido a Spring Boot 3!",
+                        Instant.now()
+                ));
 
         mockMvc.perform(get("/api/v1/saludos")
-                .param("nombre", "Ana"))
+                        .param("nombre", "Ana"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.mensaje").exists());
+                .andExpect(jsonPath("$.mensaje")
+                        .value("Hola, Ana. Bienvenido a Spring Boot 3!"));
     }
 
     @Test
-    @DisplayName("Debe fallar validacion cuando nombre es vacio")
-    void deberiaFallarValidacion() throws Exception {
-        String json = "{\"nombre\":\"\"}";
-
+    @DisplayName("Debe validar nombre obligatorio por POST")
+    void debeValidarNombreObligatorioPorPost() throws Exception {
         mockMvc.perform(post("/api/v1/saludos")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"nombre\":\"\"}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.codigo").value("VALIDATION_ERROR"));
+    }
+
+    @Test
+    @DisplayName("Debe responder error de negocio al contener numeros")
+    void debeResponderErrorDeNegocio() throws Exception {
+        when(saludoService.crearSaludo("Ana1"))
+                .thenThrow(new IllegalArgumentException(
+                        "El nombre no puede contener numeros"
+                ));
+
+        mockMvc.perform(get("/api/v1/saludos")
+                        .param("nombre", "Ana1"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.codigo")
+                        .value("BUSINESS_RULE_ERROR"));
     }
 }

@@ -32,18 +32,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> manejarGenerica(Exception ex) {
-        ErrorResponse body = new ErrorResponse(
-                "INTERNAL_ERROR",
-                "Ocurrio un error interno",
-                Instant.now(),
-                Map.of()
-        );
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
-    }
-
-    
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> manejarReglaDeNegocio(IllegalArgumentException ex) {
         ErrorResponse body = new ErrorResponse(
@@ -54,5 +42,15 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
-   
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> manejarGenerica(Exception ex) {
+        ErrorResponse body = new ErrorResponse(
+                "INTERNAL_ERROR",
+                "Ocurrio un error interno",
+                Instant.now(),
+                Map.of()
+        );
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
+    }
 }

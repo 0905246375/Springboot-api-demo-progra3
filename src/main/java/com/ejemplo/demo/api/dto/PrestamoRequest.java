@@ -1,20 +1,25 @@
 package com.ejemplo.demo.api.dto;
 
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 
 public record PrestamoRequest(
 
-        @NotNull
+        @NotNull(message = "El monto es obligatorio")
         @DecimalMin(value = "0.01", message = "El monto debe ser mayor a 0")
         BigDecimal monto,
 
-        @NotNull
-        @DecimalMin(value = "0.01", message = "La tasa debe ser mayor a 0")
+        @NotNull(message = "La tasa anual es obligatoria")
+        @DecimalMin(value = "0.01", message = "La tasa anual debe ser mayor a 0")
         BigDecimal tasaAnual,
 
-        @Min(value = 1, message = "Meses mínimo 1")
-        @Max(value = 360, message = "Meses máximo 360")
-        int meses
-) {}
+        @NotNull(message = "Los meses son obligatorios")
+        @Min(value = 1, message = "Los meses deben ser mayor o igual a 1")
+        @Max(value = 360, message = "Los meses deben ser menor o igual a 360")
+        Integer meses
+) {
+}
