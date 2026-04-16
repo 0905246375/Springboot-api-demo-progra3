@@ -2,6 +2,8 @@ package com.ejemplo.demo.domain.service;
 
 import com.ejemplo.demo.api.dto.PrestamoRequest;
 import com.ejemplo.demo.api.dto.PrestamoResponse;
+import com.ejemplo.demo.service.PrestamoService;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

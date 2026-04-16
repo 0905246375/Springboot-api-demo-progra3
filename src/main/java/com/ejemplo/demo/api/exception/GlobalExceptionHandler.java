@@ -7,6 +7,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import jakarta.persistence.EntityNotFoundException;
 
 import java.time.Instant;
 import java.util.HashMap;
@@ -52,5 +53,17 @@ public class GlobalExceptionHandler {
                 Map.of()
         );
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
+    }
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<ErrorResponse> manejarNoEncontrado(EntityNotFoundException ex) {
+
+        ErrorResponse body = new ErrorResponse(
+                "NOT_FOUND",
+                ex.getMessage(),
+                Instant.now(),
+                Map.of()
+        );
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
     }
 }

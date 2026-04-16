@@ -1,4 +1,4 @@
-package com.ejemplo.demo.domain.service;
+package com.ejemplo.demo.service;
 
 import com.ejemplo.demo.api.dto.PrestamoRequest;
 import com.ejemplo.demo.api.dto.PrestamoResponse;
@@ -17,7 +17,7 @@ public class PrestamoService {
             new MathContext(16, RoundingMode.HALF_UP);
 
     public PrestamoResponse simular(PrestamoRequest request) {
-        // Validaciones de reglas de negocio
+        
         validarReglas(request);
 
         BigDecimal monto = request.monto();
@@ -26,7 +26,7 @@ public class PrestamoService {
                 .divide(CIEN, MATH_CONTEXT)
                 .divide(DOCE, MATH_CONTEXT);
 
-        // Fórmula de cuota fija (amortización)
+      
         double factor = Math.pow(
                 BigDecimal.ONE.add(tasaMensual).doubleValue(),
                 meses
@@ -53,7 +53,7 @@ public class PrestamoService {
 
         return new PrestamoResponse(cuotaMensual, interesTotal, totalPagar);
     }
-
+   
     private void validarReglas(PrestamoRequest request) {
         if (request.tasaAnual().compareTo(BigDecimal.valueOf(100)) > 0) {
             throw new IllegalArgumentException(
@@ -64,6 +64,8 @@ public class PrestamoService {
             throw new IllegalArgumentException(
                     "El monto excede el maximo permitido para simulacion"
             );
+            
+            
         }
     }
 }
