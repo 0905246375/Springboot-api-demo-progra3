@@ -1,0 +1,75 @@
+openapi: 3.0.3
+
+info:
+  title: Workshop API
+  version: 1.0.0
+  description: API del taller Spring Boot
+
+servers:
+  - url: http://localhost:8080
+
+paths:
+
+  /api/v1:
+    get:
+      tags:
+        - workshop
+
+      operationId: getWorkshopHealth
+
+      responses:
+        '200':
+          description: OK
+
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /api/v1/saludos:
+
+    get:
+      tags:
+        - saludos
+
+      operationId: saludarPorGet
+
+      parameters:
+        - name: nombre
+          in: query
+          required: false
+
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: Saludo correcto
+
+          content:
+            application/json:
+              schema:
+                type: object
+
+    post:
+      tags:
+        - saludos
+
+      operationId: saludarPorPost
+
+      requestBody:
+        required: true
+
+        content:
+          application/json:
+            schema:
+              type: object
+
+      responses:
+        '200':
+          description: Saludo creado
+
+          content:
+            application/json:
+              schema:
+                type: object                                                                                                                                                                                       

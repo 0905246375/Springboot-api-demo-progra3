@@ -1,17 +1,19 @@
 package com.ejemplo.demo.api.controller;
 
 import com.ejemplo.demo.api.dto.SaludoRequest;
-import com.ejemplo.demo.api.dto.SaludoResponse;
 import com.ejemplo.demo.domain.service.SaludoService;
+import com.ejemplo.demo.generated.api.SaludosApi;
+import com.ejemplo.demo.generated.api.WorkshopApi;
+
 import jakarta.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1")
-public class SaludoController {
+public class SaludoController implements WorkshopApi, SaludosApi {
 
     // Inyección por constructor
     private final SaludoService saludoService;
@@ -19,10 +21,15 @@ public class SaludoController {
     public SaludoController(SaludoService saludoService) {
         this.saludoService = saludoService;
     }
+    @Override
+    public java.util.Optional<org.springframework.web.context.request.NativeWebRequest> getRequest() {
+        return java.util.Optional.empty();
+    }
 
-    // Endpoint base de salud
-    @GetMapping
-    public ResponseEntity<Map<String, String>> health() {
+    // GET /api/v1
+    @Override
+    public ResponseEntity<Object> getWorkshopHealth() {
+
         return ResponseEntity.ok(Map.of(
                 "estado", "ok",
                 "mensaje", "Workshop Spring Boot activo"
@@ -30,18 +37,33 @@ public class SaludoController {
     }
 
     // GET /api/v1/saludos
-    @GetMapping("/saludos")
-    public ResponseEntity<SaludoResponse> saludar(
-            @RequestParam(defaultValue = "Mundo") String nombre
-    ) {
-        return ResponseEntity.ok(saludoService.crearSaludo(nombre));
+    @Override
+    public ResponseEntity<Object> saludarPorGet(String nombre) {
+
+        return ResponseEntity.ok(
+                saludoService.crearSaludo(nombre)
+        );
     }
 
     // POST /api/v1/saludos
-    @PostMapping("/saludos")
-    public ResponseEntity<SaludoResponse> saludarPost(
-            @Valid @RequestBody SaludoRequest request
-    ) {
-        return ResponseEntity.ok(saludoService.crearSaludo(request.nombre()));
+    @Override
+    public ResponseEntity<Object> saludarPorPost(Object body) {
+
+        Map<String, Object> data = (Map<String, Object>) body;
+
+        String nombre = (String) data.get("nombre");
+
+        if (nombre == null || nombre.trim().isEmpty()) {
+
+            return ResponseEntity.badRequest().body(
+                    Map.of(
+                            "codigo", "VALIDATION_ERROR",
+                            "mensaje", "El nombre es obligatorio"
+                    )
+        );
+    }
+        return ResponseEntity.ok(
+                saludoService.crearSaludo(nombre)
+        );
     }
 }
